@@ -52,6 +52,10 @@ func (mat *Matrix) Rows() int {
 	return mat.m
 }
 
+func (mat *Matrix) ToVec() []float64 {
+	return mat.data
+}
+
 // Private helper functions used by matrix operations
 
 func add_vec(va, vb, vc []float64) {
