@@ -38,10 +38,6 @@ func (mat *Matrix) index_at(i, j int) int {
 	return i * mat.n + j
 }
 
-func (mat *Matrix) value_at(i, j int) float64 {
-	return mat.data[i * mat.n + j]
-}
-
 // Public Matrix methods
 
 func (mat *Matrix) Cols() int {
@@ -54,6 +50,20 @@ func (mat *Matrix) Rows() int {
 
 func (mat *Matrix) ToVec() []float64 {
 	return mat.data
+}
+
+func (mat *Matrix) ValueAt(row, col int) float64 {
+	if row > mat.m || row < 0 || col > mat.n || col < 0 {
+		panic("Row or column out of bounds")
+	}
+	return mat.data[row * mat.n + col]
+}
+
+func (mat *Matrix) ValueAtIndex(i int) float64 {
+	if i < 0 || i > len(mat.data) {
+		panic("Matrix index out of bounds")
+	}
+	return mat.data[i]
 }
 
 // Private helper functions used by matrix operations
@@ -136,9 +146,9 @@ func FromVec(vec []float64) *Matrix {
 	return &Matrix{len(vec), 1, vec}
 }
 
-// Mul applies Hadamard product between matrix 'ma' and 'mb'
+// Hadamard applies Hadamard product between matrix 'ma' and 'mb'
 // and returns a ptr to the resulting matrix
-func Mul(ma, mb *Matrix) *Matrix {
+func Hadamard(ma, mb *Matrix) *Matrix {
 	if ma.m != mb.m && ma.n != mb.n {
 		panic("Dimensions of matrix A and matrix B must be equal")
 	}
@@ -147,6 +157,16 @@ func Mul(ma, mb *Matrix) *Matrix {
 		mc.data[i] = ma.data[i] * mb.data[i]
 	}
 	return mc
+}
+
+// Mul multiplies scalar 'v' by matrix 'ma' and returns
+// a ptr to the resulting matrix
+func Mul(v float64, ma *Matrix) *Matrix {
+	mb := &Matrix{ma.m, ma.n, make([]float64, ma.m * ma.n)}
+	for i, val := range ma.data {
+		mb.data[i] = val * v
+	}
+	return mb
 }
 
 // New returns a ptr to a MxN matrix using manually-inputted floats
@@ -168,6 +188,15 @@ func New(d [][]float64) *Matrix {
 		for j := 0; j < n; j++ {
 			mat.data[mat.index_at(i, j)] = d[i][j]
 		}
+	}
+	return mat
+}
+
+// Ones returns a ptr to a m x n matrix with 1-initialised elements
+func Ones(m, n int) *Matrix {
+	mat := &Matrix{m, n, make([]float64, m * n)}
+	for i := 0; i < m * n; i++ {
+		mat.data[i] = 1.0
 	}
 	return mat
 }
@@ -202,16 +231,6 @@ func Sigmoidpr(ma *Matrix) *Matrix {
 	return mb
 }
 
-// Scale multiplies scalar 'v' by matrix 'ma' and returns
-// a ptr to the resulting matrix
-func Scale(v float64, ma *Matrix) *Matrix {
-	mb := &Matrix{ma.m, ma.n, make([]float64, ma.m * ma.n)}
-	for i, val := range ma.data {
-		mb.data[i] = val * v
-	}
-	return mb
-}
-
 // Sub subtracts 'mb' from matrix 'ma' and returns
 // a ptr to the resulting matrix
 func Sub(ma, mb *Matrix) *Matrix {
@@ -239,7 +258,7 @@ func Transpose(ma *Matrix) *Matrix {
 	mb := &Matrix{ma.n, ma.m, make([]float64, ma.m * ma.n)}
 	for j := 0; j < ma.n; j++ {
 		for i := 0; i < ma.m; i++ {
-			mb.data[j * mb.n + i] = ma.value_at(i, j)
+			mb.data[j * mb.n + i] = ma.ValueAt(i, j)
 		}
 	}
 	return mb

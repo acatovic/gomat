@@ -36,6 +36,15 @@ func ExampleDot() {
 	// Data: [9 12 15 19 26 33 29 40 51]
 }
 
+func ExampleOnes() {
+	ma := Ones(3,2)
+	fmt.Printf("Rows: %d\nCols: %d\nData: %v", ma.m, ma.n, ma.data)
+	// Output:
+	// Rows: 3
+	// Cols: 2
+	// Data: [1 1 1 1 1 1]
+}
+
 func ExampleSub() {
 	ma := New([][]float64{{1,2},
 		                  {3,4}})
@@ -60,6 +69,29 @@ func ExampleTranspose() {
 	// Data: [1 4 2 5 3 6]
 }
 
+func ExampleValueAt() {
+	row, col := 0, 1
+	ma := New([][]float64{{1,2,3},
+						  {4,5,6}})
+	val := ma.ValueAt(row, col)
+	fmt.Printf("Row: %d\nCol: %d\nValue: %d", row, col, int(val))
+	// Output:
+	// Row: 0
+	// Col: 1
+	// Value: 2
+}
+
+func ExampleValueAtIndex() {
+	index := 4
+	ma := New([][]float64{{1,2,3},
+						  {4,5,6}})
+	val := ma.ValueAtIndex(index)
+	fmt.Printf("Index: %d\nValue: %d", index, int(val))
+	// Output:
+	// Index: 4
+	// Value: 5
+}
+
 func ExampleZeros() {
 	ma := Zeros(3,2)
 	fmt.Printf("Rows: %d\nCols: %d\nData: %v", ma.m, ma.n, ma.data)
@@ -74,8 +106,8 @@ func ExampleZeros() {
 ////////////////
 
 func BenchmarkAdd(b *testing.B) {
-	ma := Randn(1024, 1024)
-	mb := Randn(1024, 1024)
+	ma := Randn(1000, 1000)
+	mb := Randn(1000, 1000)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		Add(ma, mb)
@@ -83,8 +115,8 @@ func BenchmarkAdd(b *testing.B) {
 }
 
 func BenchmarkDot(b *testing.B) {
-	ma := Randn(1024, 1024)
-	mb := Randn(1024, 1024)
+	ma := Randn(1000, 1000)
+	mb := Randn(1000, 1000)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		Dot(ma, mb)
@@ -92,10 +124,18 @@ func BenchmarkDot(b *testing.B) {
 }
 
 func BenchmarkSub(b *testing.B) {
-	ma := Randn(1024, 1024)
-	mb := Randn(1024, 1024)
+	ma := Randn(1000, 1000)
+	mb := Randn(1000, 1000)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		Sub(ma, mb)
+	}
+}
+
+func BenchmarkTranspose(b *testing.B) {
+	ma := Randn(1000, 1000)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		Transpose(ma)
 	}
 }
